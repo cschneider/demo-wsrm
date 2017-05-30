@@ -29,6 +29,7 @@
     <description>Demo services</description>
 
     <modules>
+        <module>features</module>
         <module>greeter-common</module>
         <module>greeter-service</module>
     </modules>

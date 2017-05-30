@@ -22,8 +22,11 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
 
 @RunWith(PaxExam.class)
@@ -32,8 +35,11 @@ public class KarafConfigurationTest extends KarafTestSupport {
 
 	@Configuration
 	public Option[] config() {
+		MavenUrlReference demoFeaturesRepo = getFeaturesRepo("org.apifocal.demo.wsrm", "greeter-features");
+
 	    return new Option[] {
-	    	standardConfig()
+	        standardConfig(),
+	        features(demoFeaturesRepo, "greeter-service"),
 	   };
 	}
 

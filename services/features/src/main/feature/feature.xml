@@ -32,12 +32,13 @@
         <bundle>mvn:org.apifocal.demo.wsrm/greeter-common/${project.version}</bundle>
     </feature>
 
-    <feature name='greeter-service' description='Sample Greeter' version='${project.version}'>
-        <details>Sample implementation of the greeter service</details>
+    <feature name='greeter-wsrm' description='Sample Greeter' version='${project.version}'>
+        <details>Greeter service deployment using WS-RM policies</details>
 
         <feature>greeter-common</feature>
 
         <bundle>mvn:org.apifocal.demo.wsrm/greeter-service/${project.version}</bundle>
+        <bundle>mvn:org.apifocal.demo.wsrm/greeter-wsrm/${project.version}</bundle>
     </feature>
 
 </features>

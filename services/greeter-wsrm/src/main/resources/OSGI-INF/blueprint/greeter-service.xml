@@ -51,12 +51,12 @@
         </cxf:features>
     </cxf:bus>
 
-    <bean id="greeterService" class="org.apifocal.demo.greeter.service.GreeterService" />
+    <bean id="greeterWsrm" class="org.apifocal.demo.greeter.service.GreeterService" />
 
-    <jaxws:endpoint address="/greeter-service"
-                    implementor="#greeterService"
+    <jaxws:endpoint address="/greeter-wsrm"
+                    implementor="#greeterWsrm"
                     implementorClass="org.apifocal.demo.greeter.service.GreeterService"
-                    wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/service/greeter.wsdl">
+                    wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/wsrm/greeter.wsdl">
     </jaxws:endpoint>
 
 </blueprint>

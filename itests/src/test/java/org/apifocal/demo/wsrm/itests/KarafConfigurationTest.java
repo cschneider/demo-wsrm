@@ -39,7 +39,7 @@ public class KarafConfigurationTest extends KarafTestSupport {
 
 	    return new Option[] {
 	        standardConfig(),
-	        features(demoFeaturesRepo, "greeter-service"),
+	        features(demoFeaturesRepo, "greeter-wsrm"),
 	   };
 	}
 
@@ -49,8 +49,8 @@ public class KarafConfigurationTest extends KarafTestSupport {
 
 	    assertBundleStarted("org.apache.karaf.bundle.core");
 
-	    // Bundle-SymbolicName = org.apifocal.demo.wsrm.greeter-service
-	    assertBundleStarted("org.apifocal.demo.wsrm.greeter-service");
+	    // Bundle-SymbolicName = org.apifocal.demo.wsrm.greeter-wsrm
+	    assertBundleStarted("org.apifocal.demo.wsrm.greeter-wsrm");
     }
 
 }

@@ -48,7 +48,7 @@ public class GreeterClientTest extends KarafTestSupport {
 	        standardConfig(),
 	        cxfTestUtils(),
 	        features(cxfFeaturesRepo, "http", "cxf-http-jetty"),
-	        features(demoFeaturesRepo, "greeter-service"),
+	        features(demoFeaturesRepo, "greeter-wsrm"),
 	   };
 	}
 
@@ -59,7 +59,7 @@ public class GreeterClientTest extends KarafTestSupport {
 
     @Before
     public void createClient() {
-        greeter = OSGiTestHelper.greeterHttpProxy("8181", "greeter-service");
+        greeter = OSGiTestHelper.greeterHttpProxy("8181", "greeter-wsrm");
     }
 
 
@@ -69,8 +69,8 @@ public class GreeterClientTest extends KarafTestSupport {
 
     @Ignore @Test
     public void testContainerConfiguration() throws Exception {
-	    assertBundleStarted("org.apifocal.demo.wsrm.greeter-service");
-        assertServicePublished("(&(objectClass=org.apache.cxf.Bus)(cxf.bus.id=org.apifocal.demo.wsrm.greeter-service-cxf*))", 2000);
+	    assertBundleStarted("org.apifocal.demo.wsrm.greeter-wsrm");
+        assertServicePublished("(&(objectClass=org.apache.cxf.Bus)(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*))", 2000);
 
         String result = greeter.greetMe("World");
         Assert.assertEquals("Hello World", result);

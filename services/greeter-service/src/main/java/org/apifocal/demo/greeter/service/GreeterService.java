@@ -20,7 +20,8 @@ import javax.jws.WebService;
 import org.apifocal.demo.greeter.Greeter;
 import org.apifocal.demo.greeter.PingMeFault;
 
-@WebService(serviceName = "GreeterService",
+@WebService(
+    serviceName = "GreeterService",
     portName = "GreeterPort",
     endpointInterface = "org.apifocal.demo.greeter.Greeter")
 public class GreeterService implements Greeter {

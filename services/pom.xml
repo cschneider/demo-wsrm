@@ -32,6 +32,7 @@
         <module>features</module>
         <module>greeter-common</module>
         <module>greeter-service</module>
+        <module>greeter-wsrm</module>
     </modules>
 
 </project>

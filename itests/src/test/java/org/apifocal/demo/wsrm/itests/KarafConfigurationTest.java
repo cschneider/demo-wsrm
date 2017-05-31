@@ -35,7 +35,7 @@ public class KarafConfigurationTest extends KarafTestSupport {
 
 	@Configuration
 	public Option[] config() {
-		MavenUrlReference demoFeaturesRepo = getFeaturesRepo("org.apifocal.demo.wsrm", "greeter-features");
+		MavenUrlReference demoFeaturesRepo = getFeaturesRepo("org.apifocal.demo.wsrm", "features");
 
 	    return new Option[] {
 	        standardConfig(),
@@ -48,6 +48,9 @@ public class KarafConfigurationTest extends KarafTestSupport {
 	    Assert.assertNotNull(bootFinished);
 
 	    assertBundleStarted("org.apache.karaf.bundle.core");
+
+	    // Bundle-SymbolicName = org.apifocal.demo.wsrm.greeter-service
+	    assertBundleStarted("org.apifocal.demo.wsrm.greeter-service");
     }
 
 }

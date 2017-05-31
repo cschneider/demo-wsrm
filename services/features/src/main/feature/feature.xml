@@ -14,7 +14,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<features name="demo-services-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
+<features name="demo-wsrm-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
 
     <repository>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</repository>
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>

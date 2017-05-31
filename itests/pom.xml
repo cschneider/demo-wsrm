@@ -33,7 +33,7 @@
         <!-- Project dependencies -->
         <dependency>
             <groupId>org.apifocal.demo.wsrm</groupId>
-            <artifactId>greeter-features</artifactId>
+            <artifactId>features</artifactId>
             <version>${project.version}</version>
             <classifier>features</classifier>
             <type>xml</type>
@@ -81,7 +81,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.karaf</groupId>
-            <artifactId>apache-karaf-minimal</artifactId>
+            <artifactId>apache-karaf</artifactId>
             <version>${karaf.version}</version>
             <type>tar.gz</type>
             <scope>test</scope>

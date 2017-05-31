@@ -16,9 +16,7 @@
 package org.apifocal.demo.wsrm.itests;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.DatagramSocket;
-import java.net.ServerSocket;
+import java.util.Dictionary;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,12 +27,15 @@ import org.apache.karaf.features.FeaturesService;
 import org.junit.Assert;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,8 @@ public abstract class KarafTestSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(KarafTestSupport.class);
     private static final String DISTRO_GID = "org.apache.karaf";
-    private static final String DISTRO_AID = "apache-karaf-minimal";
+    private static final String DISTRO_AID = "apache-karaf";
+    private static final Long SERVICE_TIMEOUT = 4000L;
 
     @Inject
     protected BootFinished bootFinished;
@@ -133,7 +135,7 @@ public abstract class KarafTestSupport {
         return null;
     }
 
-    public void assertServicePublished(String filter, int timeout) {
+    protected void assertServicePublished(String filter, int timeout) {
         try {
             Filter serviceFilter = bundleContext.createFilter(filter);
             ServiceTracker<Object, ?> tracker = new ServiceTracker<>(bundleContext, serviceFilter, null);
@@ -148,13 +150,84 @@ public abstract class KarafTestSupport {
         }
     }
 
-    public void assertBlueprintNamespacePublished(String namespace, int timeout) {
+    protected void assertBlueprintNamespacePublished(String namespace, int timeout) {
         assertServicePublished(String.format(
             "(&(objectClass=org.apache.aries.blueprint.NamespaceHandler)(osgi.service.blueprint.namespace=%s))", namespace), timeout);
     }
 
+    protected <T> T getOsgiService(Class<T> type, long timeout) {
+        return getOsgiService(type, null, timeout);
+    }
+
+    protected <T> T getOsgiService(Class<T> type) {
+        return getOsgiService(type, null, SERVICE_TIMEOUT);
+    }
+
+    protected <T> T getOsgiService(Class<T> type, String filter) {
+        return getOsgiService(type, filter, SERVICE_TIMEOUT);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected <T> T getOsgiService(Class<T> type, String filter, long timeout) {
+        ServiceTracker tracker = null;
+        try {
+            String f;
+            if (filter != null) {
+                if (filter.startsWith("(")) {
+                    f = "(&(" + Constants.OBJECTCLASS + "=" + type.getName() + ")" + filter + ")";
+                } else {
+                    f = "(&(" + Constants.OBJECTCLASS + "=" + type.getName() + ")(" + filter + "))";
+                }
+            } else {
+                f = "(" + Constants.OBJECTCLASS + "=" + type.getName() + ")";
+            }
+            Filter osgiFilter = FrameworkUtil.createFilter(f);
+            tracker = new ServiceTracker(bundleContext, osgiFilter, null);
+            tracker.open(true);
+
+            // TODO: Note that the tracker is not closed to keep the reference
+            // This is buggy, as the service reference may change i think
+            Object svc = type.cast(tracker.waitForService(timeout));
+            if (svc == null) {
+                Dictionary<String, String> dic = bundleContext.getBundle().getHeaders();
+                System.err.println("Test bundle headers: " + OSGiTestHelper.explode(dic));
+
+                for (ServiceReference<?> ref : OSGiTestHelper.asCollection(bundleContext.getAllServiceReferences(null, null))) {
+                    System.err.println("ServiceReference: " + ref);
+                }
+
+                for (ServiceReference<?> ref : OSGiTestHelper.asCollection(bundleContext.getAllServiceReferences(null, f))) {
+                    System.err.println("Filtered ServiceReference: " + ref);
+                }
+
+                throw new RuntimeException("Gave up waiting for service " + f);
+            }
+            return type.cast(svc);
+        } catch (InvalidSyntaxException e) {
+            throw new IllegalArgumentException("Invalid filter", e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void prettyLogging() throws Exception {
+    	OSGiTestHelper.enableCxfPrettyLoggingGlobally(bundleContext);
+    	
+    }
+    /**
+     * Finds a free port starting from the give port number.
+     *
+     * @return
+     */
+    protected int getFreePort(int port) {
+        while (!OSGiTestHelper.isPortAvailable(port)) {
+            port++;
+        }
+        return port;
+    }
+
     public static String getKarafVersion() {
-        return MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
+        return MavenUtils.getArtifactVersion(DISTRO_GID, DISTRO_AID);
     }
 
     public static MavenUrlReference getFeaturesRepo(String gid, String aid) {
@@ -164,47 +237,6 @@ public abstract class KarafTestSupport {
     public static MavenUrlReference getFeaturesRepo(String gid, String aid, String version) {
     	MavenUrlReference ref = maven().groupId(gid).artifactId(aid).type("xml").classifier("features");
     	return version == null ? ref.versionAsInProject() : ref.version(version);
-    }
-
-    /**
-     * Finds a free port starting from the give port number.
-     *
-     * @return
-     */
-    protected int getFreePort(int port) {
-        while (!isPortAvailable(port)) {
-            port++;
-        }
-        return port;
-    }
-
-    /**
-     * Returns true if port is available for use.
-     * TODO: check if functionality is available from dependencies.
-     *
-     * @param port
-     * @return
-     */
-    public static boolean isPortAvailable(int port) {
-        ServerSocket ss = null;
-        try (DatagramSocket ds = new DatagramSocket(port)) {
-            ss = new ServerSocket(port);
-            ss.setReuseAddress(true);
-            ds.setReuseAddress(true);
-            return true;
-        } catch (IOException e) {
-            // ignore
-        } finally {
-            if (ss != null) {
-                try {
-                    ss.close();
-                } catch (IOException e) {
-                    /* should not be thrown */
-                }
-            }
-        }
-
-        return false;
     }
 
 }

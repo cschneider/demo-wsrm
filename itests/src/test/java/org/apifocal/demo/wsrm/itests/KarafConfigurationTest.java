@@ -44,8 +44,8 @@ public class KarafConfigurationTest extends KarafTestSupport {
 	}
 
 	@Test
-    public void testContainerConfiguration() throws Exception {
-	    Assert.assertNotNull(bootFinished);
+    public void testGreeterClient() throws Exception {
+        Assert.assertNotNull(bootFinished);
 
 	    assertBundleStarted("org.apache.karaf.bundle.core");
 

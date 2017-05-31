@@ -25,6 +25,7 @@
         <feature dependency="true">framework</feature>
         <feature dependency="true">aries-blueprint</feature>
         <feature>cxf-features-logging</feature>
+        <feature>cxf-http-jetty</feature>
         <feature>cxf-jaxws</feature>
         <feature>cxf-ws-addr</feature>
 

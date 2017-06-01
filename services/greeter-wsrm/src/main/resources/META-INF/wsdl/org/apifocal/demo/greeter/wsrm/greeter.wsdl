@@ -17,7 +17,7 @@
     xmlns="http://schemas.xmlsoap.org/wsdl/" 
     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:g="http://demo.apifocal.org/greeter" 
+    xmlns:greeter="http://demo.apifocal.org/greeter"
     xmlns:tns="http://demo.apifocal.org/greeter/wsrm" 
     targetNamespace="http://demo.apifocal.org/greeter/wsrm">
 
@@ -25,7 +25,7 @@
                  location="META-INF/wsdl/org/apifocal/demo/greeter/greeter.wsdl" />
 
     <wsdl:service name="GreeterService">
-        <wsdl:port binding="g:GreeterSOAPBinding" name="GreeterPort">
+        <wsdl:port binding="greeter:GreeterSOAPBinding" name="GreeterPort">
             <soap:address location="http://example.com/SoapContext/GreeterPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2006/05/addressing/wsdl"/>
         </wsdl:port>

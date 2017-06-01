@@ -15,9 +15,9 @@
     limitations under the License.
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            xmlns:cxf="http://cxf.apache.org/blueprint/core"
-           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0"
            xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws"
            xmlns:wsa="http://cxf.apache.org/ws/addressing"
            xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"
@@ -25,15 +25,13 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="
   http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
-  http://www.osgi.org/xmlns/blueprint-ext/v1.1.0 https://svn.apache.org/repos/asf/aries/tags/blueprint-0.3.1/blueprint-core/src/main/resources/org/apache/aries/blueprint/ext/blueprint-ext.xsd
+  http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0 http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd
+  http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
-  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd
   http://cxf.apache.org/ws/addressing http://cxf.apache.org/schemas/ws-addr-conf.xsd
   http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd
-  http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd
-  http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
-  http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0 http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd">
+  http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd">
 
     <cxf:bus>
         <cxf:features>
@@ -51,12 +49,16 @@
         </cxf:features>
     </cxf:bus>
 
-    <bean id="greeterWsrm" class="org.apifocal.demo.greeter.service.GreeterService" />
+    <bean id="greeterWsrmBean" class="org.apifocal.demo.greeter.service.GreeterService" />
 
-    <jaxws:endpoint address="/greeter-wsrm"
-                    implementor="#greeterWsrm"
+    <jaxws:endpoint id="greeterWsrm"
+                    address="/greeter-wsrm"
+                    implementor="#greeterWsrmBean"
                     implementorClass="org.apifocal.demo.greeter.service.GreeterService"
-                    wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/wsrm/greeter.wsdl">
+                    wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/wsrm/greeter.wsdl"
+                    xmlns:ns1="http://demo.apifocal.org/greeter/wsrm"
+                    serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort">
+
     </jaxws:endpoint>
 
 </blueprint>

@@ -19,12 +19,19 @@ import javax.jws.WebService;
 
 import org.apifocal.demo.greeter.Greeter;
 import org.apifocal.demo.greeter.PingMeFault;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebService(
     serviceName = "GreeterService",
     portName = "GreeterPort",
     endpointInterface = "org.apifocal.demo.greeter.Greeter")
 public class GreeterService implements Greeter {
+    private static final Logger LOG = LoggerFactory.getLogger(GreeterService.class);
+
+    public GreeterService() {
+        LOG.info("Greeter service starting...");
+    }
 
     @Override
     public String greetMe(String name) {

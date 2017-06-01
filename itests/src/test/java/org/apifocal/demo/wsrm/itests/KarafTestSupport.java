@@ -27,6 +27,8 @@ import org.apache.karaf.features.FeaturesService;
 import org.junit.Assert;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.ProbeBuilder;
+import org.ops4j.pax.exam.TestProbeBuilder;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.osgi.framework.Bundle;
@@ -77,6 +79,12 @@ public abstract class KarafTestSupport {
     protected MavenUrlReference karafUrl;
     protected ExecutorService executor = Executors.newCachedThreadPool();
 
+    @ProbeBuilder
+    public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
+        // probe.setHeader(Constants.DYNAMICIMPORT_PACKAGE, "*,org.apache.felix.service.*;status=provisional");
+        return probe;
+    }
+
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for TODO: document further!
      *
@@ -97,12 +105,12 @@ public abstract class KarafTestSupport {
                 .name("Apache Karaf")
                 .useDeployFolder(false)
                 .unpackDirectory(new File("target/paxexam/")),
-            systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
+            // systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
             systemProperty("java.awt.headless").value("true"),
 	        configureConsole().ignoreLocalConsole(),
-            logLevel(LogLevel.INFO),
+            logLevel(LogLevel.WARN),
             replaceConfigurationFile("etc/org.ops4j.pax.logging.cfg", new File("src/test/resources/etc/org.ops4j.pax.logging.cfg")),
-	        features(karafStandardRepo, "scr"),
+	        // features(karafStandardRepo, "scr"),
             when(localRepo != null).useOptions(
                 editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.localRepository", localRepo)),
             when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true")));

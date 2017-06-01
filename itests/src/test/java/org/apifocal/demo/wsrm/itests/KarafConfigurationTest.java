@@ -47,10 +47,10 @@ public class KarafConfigurationTest extends KarafTestSupport {
     public void testGreeterClient() throws Exception {
         Assert.assertNotNull(bootFinished);
 
-	    assertBundleStarted("org.apache.karaf.bundle.core");
+        assertBundleStarted("org.apache.karaf.bundle.core");
 
-	    // Bundle-SymbolicName = org.apifocal.demo.wsrm.greeter-wsrm
-	    assertBundleStarted("org.apifocal.demo.wsrm.greeter-wsrm");
+        // Bundle-SymbolicName = org.apifocal.demo.wsrm.greeter-wsrm
+        assertBundleStarted("org.apifocal.demo.wsrm.greeter-wsrm");
     }
 
 }

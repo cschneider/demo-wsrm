@@ -27,7 +27,8 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apifocal.demo.greeter.Greeter;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
@@ -36,6 +37,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class GreeterClientTest extends KarafTestSupport {
+    private static final Logger LOG = LoggerFactory.getLogger(GreeterClientTest.class);
 
     private Greeter greeter;
 
@@ -67,9 +69,12 @@ public class GreeterClientTest extends KarafTestSupport {
     public void testNoop() throws Exception {
     }
 
-    @Ignore @Test
+    @Test
     public void testContainerConfiguration() throws Exception {
-	    assertBundleStarted("org.apifocal.demo.wsrm.greeter-wsrm");
+        LOG.info("TEST started");
+        Assert.assertNotNull(bootFinished);
+
+        // assertBundleStarted("org.apifocal.demo.wsrm.greeter-wsrm");
         assertServicePublished("(&(objectClass=org.apache.cxf.Bus)(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*))", 2000);
 
         String result = greeter.greetMe("World");

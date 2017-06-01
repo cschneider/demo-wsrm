@@ -24,9 +24,11 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apifocal.demo.greeter.Greeter;
@@ -73,7 +75,10 @@ public class GreeterClientTest extends KarafTestSupport {
     public void testContainerConfiguration() throws Exception {
         LOG.info("TEST started");
         Assert.assertNotNull(bootFinished);
-
+        for (Bundle b : bundleContext.getBundles()) {
+            if (b.getState() != 32)
+            System.out.println(b.getSymbolicName() + " " + b.getState());
+        }
         // assertBundleStarted("org.apifocal.demo.wsrm.greeter-wsrm");
         assertServicePublished("(&(objectClass=org.apache.cxf.Bus)(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*))", 2000);
 

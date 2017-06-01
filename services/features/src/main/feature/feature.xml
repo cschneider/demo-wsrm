@@ -28,6 +28,7 @@
         <feature>cxf-http-jetty</feature>
         <feature>cxf-jaxws</feature>
         <feature>cxf-ws-addr</feature>
+        <feature>cxf-ws-rm</feature>
 
         <bundle>mvn:org.apifocal.demo.wsrm/greeter-common/${project.version}</bundle>
     </feature>

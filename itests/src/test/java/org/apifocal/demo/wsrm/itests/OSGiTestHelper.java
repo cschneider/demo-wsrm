@@ -24,14 +24,9 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.feature.Feature;
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-
 import org.apifocal.demo.greeter.Greeter;
-
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,23 +46,10 @@ public final class OSGiTestHelper {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("http://localhost:" + port + "/cxf/" + address);
+        LoggingFeature loggingFeature = new LoggingFeature();
+        loggingFeature.setPrettyLogging(true);
+        factory.setFeatures(Collections.singletonList(loggingFeature));
         return factory.create(Greeter.class);
-    }
-
-    public static void enableCxfPrettyLoggingGlobally(BundleContext bundleContext) throws Exception {
-        bundleContext.getServiceReferences(Bus.class, null).stream()
-            .forEach((reference) -> {
-                LOG.info("Enabling pretty logging for CXF bus {}", reference.getProperty("cxf.bus.id"));
-                Bus bus = bundleContext.getService(reference);
-                enableCxfPrettyLogging(bus);
-            });
-    }
-
-    public static void enableCxfPrettyLogging(Bus bus) {
-        bus.getFeatures().stream()
-            .filter((Feature feature) -> feature instanceof LoggingFeature)
-            .map((Feature feature) -> (LoggingFeature) feature)
-            .forEach((LoggingFeature loggingFeature) -> loggingFeature.setPrettyLogging(true));
     }
 
     /**

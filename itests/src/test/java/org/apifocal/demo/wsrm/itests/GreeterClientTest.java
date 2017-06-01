@@ -15,25 +15,28 @@
  */
 package org.apifocal.demo.wsrm.itests;
 
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.is;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+
+import javax.inject.Inject;
+
+import org.apache.cxf.Bus;
+import org.apifocal.demo.greeter.Greeter;
+import org.awaitility.Awaitility;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.osgi.framework.Bundle;
+import org.ops4j.pax.exam.util.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apifocal.demo.greeter.Greeter;
-
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
 
 @RunWith(PaxExam.class)
@@ -42,6 +45,10 @@ public class GreeterClientTest extends KarafTestSupport {
     private static final Logger LOG = LoggerFactory.getLogger(GreeterClientTest.class);
 
     private Greeter greeter;
+    
+    @Inject
+    @Filter("(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*)")
+    private Bus bus;
 
 	@Configuration
 	public Option[] config() {
@@ -57,33 +64,15 @@ public class GreeterClientTest extends KarafTestSupport {
 	}
 
     @Before
-    public void enablePrettyLogging() throws Exception {
-    	prettyLogging();
-    }
-
-    @Before
     public void createClient() {
         greeter = OSGiTestHelper.greeterHttpProxy("8181", "greeter-wsrm");
     }
 
 
-	@Test
-    public void testNoop() throws Exception {
-    }
-
     @Test
     public void testContainerConfiguration() throws Exception {
         LOG.info("TEST started");
-        Assert.assertNotNull(bootFinished);
-        for (Bundle b : bundleContext.getBundles()) {
-            if (b.getState() != 32)
-            System.out.println(b.getSymbolicName() + " " + b.getState());
-        }
-        // assertBundleStarted("org.apifocal.demo.wsrm.greeter-wsrm");
-        assertServicePublished("(&(objectClass=org.apache.cxf.Bus)(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*))", 2000);
-
-        String result = greeter.greetMe("World");
-        Assert.assertEquals("Hello World", result);
+        await().until(() -> greeter.greetMe("World"), is("Hello World"));
     }
 
 }

@@ -35,7 +35,9 @@
 
     <cxf:bus>
         <cxf:features>
-            <cxf:logging />
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature">
+                <property name="prettyLogging" value="true"/>
+            </bean>
             <wsa:addressing />
             <wsrm-mgr:reliableMessaging>
                 <wsrm-policy:RMAssertion>

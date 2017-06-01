@@ -19,6 +19,12 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.is;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
 import javax.inject.Inject;
 
 import org.apache.cxf.Bus;
@@ -35,6 +41,8 @@ import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.util.Filter;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +78,18 @@ public class GreeterClientTest extends KarafTestSupport {
 
 
     @Test
-    public void testContainerConfiguration() throws Exception {
+    public void testCall() throws Exception {
         LOG.info("TEST started");
-        await().until(() -> greeter.greetMe("World"), is("Hello World"));
+        await().ignoreExceptions().until(() -> greeter.greetMe("World"), is("Hello World"));
+        Bundle bundle = bundle("org.apifocal.demo.wsrm.greeter-wsrm").get();
+        bundle.stop();
+        bundle.start();
+        await().ignoreExceptions().until(() -> greeter.greetMe("World"), is("Hello World"));
+        //String response = greeter.greetMe("World");
+    }
+    
+    private Optional<Bundle> bundle(String symName) {
+        return Arrays.asList(bundleContext.getBundles()).stream().filter(bundle -> bundle.getSymbolicName().equals(symName)).findAny();
     }
 
 }

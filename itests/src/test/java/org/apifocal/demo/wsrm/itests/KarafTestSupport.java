@@ -29,7 +29,9 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -92,7 +94,7 @@ public abstract class KarafTestSupport {
      */
     protected Option standardConfig() {
         karafUrl = maven().groupId(DISTRO_GID).artifactId(DISTRO_AID).version(getKarafVersion()).type("tar.gz");
-        MavenUrlReference karafStandardRepo = getFeaturesRepo("org.apache.karaf.features", "standard");
+        // MavenUrlReference karafStandardRepo = getFeaturesRepo("org.apache.karaf.features", "standard");
         // MavenUrlReference cxfFeaturesRepo = getFeaturesRepo("org.apache.cxf.karaf", "apache-cxf");
         // MavenUrlReference amqFeaturesRepo = getFeaturesRepo("org.apache.activemq", "activemq-karaf");
 
@@ -136,6 +138,11 @@ public abstract class KarafTestSupport {
         Assert.assertEquals("Bundle " + name + " should be started", Bundle.ACTIVE, bundle.getState());
     }
 
+    protected Optional<Bundle> bundle(String symName) {
+        return Arrays.asList(bundleContext.getBundles()).stream().filter(bundle -> bundle.getSymbolicName().equals(symName)).findAny();
+    }
+
+    @Deprecated // use implementation above
     protected Bundle findBundleByName(String symbolicName) {
         for (Bundle bundle : bundleContext.getBundles()) {
             if (bundle.getSymbolicName().equals(symbolicName)) {

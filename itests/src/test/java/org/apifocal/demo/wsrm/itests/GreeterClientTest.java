@@ -15,22 +15,10 @@
  */
 package org.apifocal.demo.wsrm.itests;
 
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.is;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
-
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
 import javax.inject.Inject;
 
 import org.apache.cxf.Bus;
 import org.apifocal.demo.greeter.Greeter;
-import org.awaitility.Awaitility;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,9 +30,12 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.util.Filter;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.is;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
 
 @RunWith(PaxExam.class)
@@ -85,11 +76,6 @@ public class GreeterClientTest extends KarafTestSupport {
         bundle.stop();
         bundle.start();
         await().ignoreExceptions().until(() -> greeter.greetMe("World"), is("Hello World"));
-        //String response = greeter.greetMe("World");
-    }
-    
-    private Optional<Bundle> bundle(String symName) {
-        return Arrays.asList(bundleContext.getBundles()).stream().filter(bundle -> bundle.getSymbolicName().equals(symName)).findAny();
     }
 
 }

@@ -64,6 +64,12 @@
             <version>${slf4j.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- OPS4J Pax Exam dependencies for integration testing -->
         <dependency>
@@ -239,7 +245,6 @@
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
-                <version>1.4.0</version>
                 <executions>
                     <!-- Needed by the karaf tests when version is not explicitly provided 
                          and .versionAsInProject() is used instead -->

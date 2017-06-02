@@ -64,6 +64,7 @@ public class GreeterClientTest extends KarafTestSupport {
 
     @Before
     public void createClient() {
+        // TODO: add tests for "greeter-persist"
         greeter = OSGiTestHelper.greeterHttpProxy("8181", "greeter-wsrm");
     }
 

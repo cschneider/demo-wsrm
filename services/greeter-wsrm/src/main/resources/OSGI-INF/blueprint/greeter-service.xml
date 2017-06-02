@@ -64,4 +64,43 @@
         </jaxws:features>
     </jaxws:endpoint>
 
+    <bean id="greeterPersistBean" class="org.apifocal.demo.greeter.service.GreeterService" />
+
+    <jaxws:endpoint id="greeterPersist"
+                    address="/greeter-persist"
+                    implementor="#greeterPersistBean"
+                    implementorClass="org.apifocal.demo.greeter.service.GreeterService"
+                    wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/wsrm/greeter.wsdl"
+                    xmlns:ns1="http://demo.apifocal.org/greeter/wsrm"
+                    serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort2">
+        <jaxws:features>
+            <wsa:addressing />
+            <wsrm-mgr:reliableMessaging>
+                <wsrm-policy:RMAssertion>
+                    <wsrm-policy:BaseRetransmissionInterval Milliseconds="4000" />
+                    <wsrm-policy:AcknowledgementInterval Milliseconds="2000" />
+                </wsrm-policy:RMAssertion>
+                <wsrm-mgr:destinationPolicy>
+                    <wsrm-mgr:acksPolicy intraMessageThreshold="0" />
+                </wsrm-mgr:destinationPolicy>
+                <wsrm-mgr:store>
+                    <wsrm-mgr:jdbcStore dataSource="rmdbDatasource"/>
+                </wsrm-mgr:store>
+            </wsrm-mgr:reliableMessaging>
+        </jaxws:features>
+    </jaxws:endpoint>
+
+    <bean id="rmdbDatasource" class="org.apache.derby.jdbc.EmbeddedDataSource">
+        <property name="databaseName" value="rmdbLink"/>
+        <property name="createDatabase" value="create"/>
+    </bean>
+    <service ref="rmdbDatasource" interface="javax.sql.DataSource">
+        <service-properties>
+            <entry key="dataSourceName" value="rmdbLink"/>
+            <entry key="osgi.jdbc.driver.name" value="derby"/>
+            <entry key="osgi.jndi.service.name" value="rmdbLink"/>
+            <entry key="url" value="jdbc:derby:rmdbLink"/>
+        </service-properties>
+    </service>
+
 </blueprint>

@@ -36,6 +36,9 @@
     <feature name='greeter-wsrm' description='Sample Greeter' version='${project.version}'>
         <details>Greeter service deployment using WS-RM policies</details>
 
+        <feature>jdbc</feature>
+        <feature>pax-jdbc-derby</feature>
+        <feature>cxf-ws-security</feature>
         <feature>greeter-common</feature>
 
         <bundle>mvn:org.apifocal.demo.wsrm/greeter-service/${project.version}</bundle>

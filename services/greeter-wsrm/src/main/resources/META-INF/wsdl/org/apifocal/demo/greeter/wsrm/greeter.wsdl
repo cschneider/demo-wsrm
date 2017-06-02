@@ -29,5 +29,9 @@
             <soap:address location="http://example.com/SoapContext/GreeterPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2006/05/addressing/wsdl"/>
         </wsdl:port>
+        <wsdl:port binding="greeter:GreeterSOAPBinding" name="GreeterPort">
+            <soap:address location="http://example.com/SoapContext/GreeterPort2"/>
+            <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2006/05/addressing/wsdl"/>
+        </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

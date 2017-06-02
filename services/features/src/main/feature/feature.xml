@@ -16,7 +16,7 @@
 -->
 <features name="demo-wsrm-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
 
-    <repository>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</repository>
+    <repository>mvn:org.apache.karaf.features/enterprise/${karaf.version}/xml/features</repository>
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
 
     <feature name='greeter-common' description='Greeter Definition' version='${project.version}'>

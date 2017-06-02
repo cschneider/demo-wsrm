@@ -18,7 +18,9 @@ package org.apifocal.demo.wsrm.itests;
 import javax.inject.Inject;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apifocal.demo.greeter.Greeter;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +38,8 @@ import org.slf4j.LoggerFactory;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.is;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+
+import java.util.concurrent.TimeUnit;
 
 
 @RunWith(PaxExam.class)
@@ -72,11 +76,24 @@ public class GreeterClientTest extends KarafTestSupport {
     @Test
     public void testCall() throws Exception {
         LOG.info("TEST started");
-        await().ignoreExceptions().until(() -> greeter.greetMe("World"), is("Hello World"));
+        await().ignoreExceptions().pollDelay(1, TimeUnit.SECONDS).until(() -> greeter.greetMe("World"), is("Hello World"));
+        greeter.greetMe("World2");
+        Thread.sleep(2000);
+        greeter.greetMe("World23");
         Bundle bundle = bundle("org.apifocal.demo.wsrm.greeter-wsrm").get();
         bundle.stop();
+        //Thread.sleep(5000);
+        //greeter.greetMe("World24");
         bundle.start();
-        await().ignoreExceptions().until(() -> greeter.greetMe("World"), is("Hello World"));
+        Thread.sleep(2000);
+        greeter.greetMe("World3");
+        greeter.greetMe("World4");
+        //await().ignoreExceptions().until(() -> greeter.greetMe("World3"), is("Hello World3"));
+    }
+    
+    @After
+    public void stop() {
+        ClientProxy.getClient(greeter).destroy(); 
     }
 
 }

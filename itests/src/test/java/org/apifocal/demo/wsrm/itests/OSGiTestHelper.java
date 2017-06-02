@@ -26,6 +26,8 @@ import java.util.Enumeration;
 
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.apache.cxf.ws.rm.feature.RMFeature;
 import org.apifocal.demo.greeter.Greeter;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
@@ -46,9 +48,12 @@ public final class OSGiTestHelper {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("http://localhost:" + port + "/cxf/" + address);
+        factory.setWsdlLocation("http://localhost:" + port + "/cxf/" + address + "?wsdl");
         LoggingFeature loggingFeature = new LoggingFeature();
         loggingFeature.setPrettyLogging(true);
-        factory.setFeatures(Collections.singletonList(loggingFeature));
+        RMFeature rmFeature = new RMFeature();
+        WSAddressingFeature wsaFeature = new WSAddressingFeature();
+        factory.setFeatures(Arrays.asList(loggingFeature, rmFeature, wsaFeature));
         return factory.create(Greeter.class);
     }
 

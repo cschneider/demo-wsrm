@@ -38,6 +38,17 @@
             <bean class="org.apache.cxf.ext.logging.LoggingFeature">
                 <property name="prettyLogging" value="true"/>
             </bean>
+ 
+            <wsa:addressing />
+            <wsrm-mgr:reliableMessaging>
+                <wsrm-policy:RMAssertion>
+                    <wsrm-policy:BaseRetransmissionInterval Milliseconds="4000" />
+                    <wsrm-policy:AcknowledgementInterval Milliseconds="2000" />
+                </wsrm-policy:RMAssertion>
+                <wsrm-mgr:destinationPolicy>
+                    <wsrm-mgr:acksPolicy intraMessageThreshold="0" />
+                </wsrm-mgr:destinationPolicy>
+            </wsrm-mgr:reliableMessaging>
         </cxf:features>
     </cxf:bus>
 
@@ -50,20 +61,8 @@
                     wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/wsrm/greeter.wsdl"
                     xmlns:ns1="http://demo.apifocal.org/greeter/wsrm"
                     serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort">
-        <jaxws:features>
-            <wsa:addressing />
-            <wsrm-mgr:reliableMessaging>
-                <wsrm-policy:RMAssertion>
-                    <wsrm-policy:BaseRetransmissionInterval Milliseconds="4000" />
-                    <wsrm-policy:AcknowledgementInterval Milliseconds="2000" />
-                </wsrm-policy:RMAssertion>
-                <wsrm-mgr:destinationPolicy>
-                    <wsrm-mgr:acksPolicy intraMessageThreshold="0" />
-                </wsrm-mgr:destinationPolicy>
-            </wsrm-mgr:reliableMessaging>
-        </jaxws:features>
     </jaxws:endpoint>
-
+<!--
     <bean id="greeterPersistBean" class="org.apifocal.demo.greeter.service.GreeterService" />
 
     <jaxws:endpoint id="greeterPersist"
@@ -102,5 +101,5 @@
             <entry key="url" value="jdbc:derby:rmdbLink"/>
         </service-properties>
     </service>
-
+-->
 </blueprint>

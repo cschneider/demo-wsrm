@@ -120,7 +120,7 @@ public abstract class KarafTestSupport {
             when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true")));
     }
 
-    protected Option demoDebugConfig() {
+    protected Option debugConfig() {
         return composite(standardConfig(),
             debugConfiguration(),
             keepRuntimeFolder(),
@@ -133,23 +133,13 @@ public abstract class KarafTestSupport {
     }
 
     protected void assertBundleStarted(String name) {
-        Bundle bundle = findBundleByName(name);
-        Assert.assertNotNull("Bundle " + name + " should be installed", bundle);
-        Assert.assertEquals("Bundle " + name + " should be started", Bundle.ACTIVE, bundle.getState());
+        Optional<Bundle> bundle = bundle(name);
+        Assert.assertNotNull("Bundle " + name + " should be installed", bundle.get());
+        Assert.assertEquals("Bundle " + name + " should be started", Bundle.ACTIVE, bundle.get().getState());
     }
 
     protected Optional<Bundle> bundle(String symName) {
         return Arrays.asList(bundleContext.getBundles()).stream().filter(bundle -> bundle.getSymbolicName().equals(symName)).findAny();
-    }
-
-    @Deprecated // use implementation above
-    protected Bundle findBundleByName(String symbolicName) {
-        for (Bundle bundle : bundleContext.getBundles()) {
-            if (bundle.getSymbolicName().equals(symbolicName)) {
-                return bundle;
-            }
-        }
-        return null;
     }
 
     protected void assertServicePublished(String filter, int timeout) {

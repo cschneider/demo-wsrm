@@ -72,6 +72,11 @@ public class GreeterClientTest extends KarafTestSupport {
         greeter = OSGiTestHelper.greeterHttpProxy("8181", "greeter-wsrm");
     }
 
+    @After
+    public void destroyClient() {
+        ClientProxy.getClient(greeter).destroy();
+    }
+
 
     @Test
     public void testCall() throws Exception {
@@ -86,14 +91,12 @@ public class GreeterClientTest extends KarafTestSupport {
         //greeter.greetMe("World24");
         bundle.start();
         Thread.sleep(2000);
-        greeter.greetMe("World3");
+        try {
+            greeter.greetMe("World3");
+        } catch (Exception e) {
+        }
         greeter.greetMe("World4");
         //await().ignoreExceptions().until(() -> greeter.greetMe("World3"), is("Hello World3"));
-    }
-    
-    @After
-    public void stop() {
-        ClientProxy.getClient(greeter).destroy(); 
     }
 
 }

@@ -38,7 +38,7 @@
 
         <feature>jdbc</feature>
         <feature>pax-jdbc-derby</feature>
-        <feature>cxf-ws-security</feature>
+        <!-- feature>cxf-ws-security</feature -->
         <feature>greeter-common</feature>
 
         <bundle>mvn:org.apifocal.demo.wsrm/greeter-service/${project.version}</bundle>

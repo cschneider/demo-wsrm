@@ -122,7 +122,7 @@ public abstract class KarafTestSupport {
 
     protected Option debugConfig() {
         return composite(standardConfig(),
-            debugConfiguration(),
+            // debugConfiguration(),
             keepRuntimeFolder(),
             logLevel(LogLevel.DEBUG)
         );

@@ -59,7 +59,7 @@ public class GreeterClientTest extends KarafTestSupport {
         MavenUrlReference cxfFeaturesRepo = getFeaturesRepo("org.apache.cxf.karaf", "apache-cxf");
 
 	    return new Option[] {
-	        standardConfig(),
+	        debugConfig(),
 	        cxfTestUtils(),
 	        features(cxfFeaturesRepo, "http", "cxf-http-jetty"),
 	        features(demoFeaturesRepo, "greeter-wsrm"),
@@ -85,18 +85,22 @@ public class GreeterClientTest extends KarafTestSupport {
         greeter.greetMe("World2");
         Thread.sleep(2000);
         greeter.greetMe("World23");
+
         Bundle bundle = bundle("org.apifocal.demo.wsrm.greeter-wsrm").get();
         bundle.stop();
-        //Thread.sleep(5000);
+        Thread.sleep(5000);
         //greeter.greetMe("World24");
         bundle.start();
         Thread.sleep(2000);
+        greeter.greetMe("World3");
+        /*
         try {
             greeter.greetMe("World3");
         } catch (Exception e) {
         }
         greeter.greetMe("World4");
         //await().ignoreExceptions().until(() -> greeter.greetMe("World3"), is("Hello World3"));
+        */
     }
 
 }

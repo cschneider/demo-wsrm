@@ -28,8 +28,6 @@
         <wsdl:port binding="greeter:GreeterSOAPBinding" name="GreeterPort">
             <soap:address location="http://example.com/SoapContext/GreeterPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2006/05/addressing/wsdl"/>
-            <!-- 
-            
             <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
                 <wsp:ExactlyOne>
                     <wsp:All>
@@ -51,7 +49,6 @@
                     </wsp:All>
                 </wsp:ExactlyOne>
             </wsp:Policy>
-             -->
         </wsdl:port>
         <wsdl:port binding="greeter:GreeterSOAPBinding" name="GreeterPort2">
             <soap:address location="http://example.com/SoapContext/GreeterPort2"/>

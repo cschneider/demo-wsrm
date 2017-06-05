@@ -47,6 +47,14 @@
             <type>xml</type>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>enterprise</artifactId>
+            <version>${karaf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- feature validation in the verify phase must happen after all dependent modules were built -->
         <dependency>

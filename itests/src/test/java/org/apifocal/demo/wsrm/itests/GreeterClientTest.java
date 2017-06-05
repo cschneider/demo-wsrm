@@ -53,13 +53,13 @@ public class GreeterClientTest extends KarafTestSupport {
     @Filter("(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*)")
     private Bus bus;
 
-	@Configuration
-	public Option[] config() {
-		MavenUrlReference demoFeaturesRepo = getFeaturesRepo("org.apifocal.demo.wsrm", "features");
+    @Configuration
+    public Option[] config() {
+        MavenUrlReference demoFeaturesRepo = getFeaturesRepo("org.apifocal.demo.wsrm", "features");
         MavenUrlReference cxfFeaturesRepo = getFeaturesRepo("org.apache.cxf.karaf", "apache-cxf");
 
 	    return new Option[] {
-	        debugConfig(),
+	        standardConfig(),
 	        cxfTestUtils(),
 	        features(cxfFeaturesRepo, "http", "cxf-http-jetty"),
 	        features(demoFeaturesRepo, "greeter-wsrm"),
@@ -88,10 +88,15 @@ public class GreeterClientTest extends KarafTestSupport {
 
         Bundle bundle = bundle("org.apifocal.demo.wsrm.greeter-wsrm").get();
         bundle.stop();
-        Thread.sleep(5000);
-        //greeter.greetMe("World24");
+        Thread.sleep(1000);
+        // greeter.greetMe("World24");
         bundle.start();
-        Thread.sleep(2000);
+        Thread.sleep(1000);
+
+        // FIXME: Commenting out the line below will cause the test to pass 
+        //   for now sending a message after a service restart fails
+        // https://issues.apache.org/jira/browse/CXF-7392
+        // https://issues.apache.org/jira/browse/CXF-7394
         greeter.greetMe("World3");
         /*
         try {

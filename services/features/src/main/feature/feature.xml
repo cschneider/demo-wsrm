@@ -28,7 +28,6 @@
         <feature>cxf-http-jetty</feature>
         <feature>cxf-jaxws</feature>
         <feature>cxf-ws-addr</feature>
-        <feature>cxf-ws-rm</feature>
 
         <bundle>mvn:org.apifocal.demo.wsrm/greeter-common/${project.version}</bundle>
     </feature>
@@ -36,9 +35,10 @@
     <feature name='greeter-wsrm' description='Sample Greeter' version='${project.version}'>
         <details>Greeter service deployment using WS-RM policies</details>
 
+        <feature>cxf-ws-security</feature>
+        <feature>cxf-ws-rm</feature>
         <feature>jdbc</feature>
         <feature>pax-jdbc-derby</feature>
-        <!-- feature>cxf-ws-security</feature -->
         <feature>greeter-common</feature>
 
         <bundle>mvn:org.apifocal.demo.wsrm/greeter-service/${project.version}</bundle>

@@ -54,13 +54,7 @@
         </cxf:features>
     </cxf:bus>
 
-    <http:conduit name="{http://demo.apifocal.org/greeter/wsrm}GreeterPort.http-conduit">
-        <http:client DecoupledEndpoint="http://localhost:8182/decoupled_endpoint"/>
-    </http:conduit>
-
-
     <bean id="greeterWsrmBean" class="org.apifocal.demo.greeter.service.GreeterService" />
-
     <jaxws:endpoint id="greeterWsrm"
                     address="/greeter-wsrm"
                     implementor="#greeterWsrmBean"
@@ -69,33 +63,41 @@
                     xmlns:ns1="http://demo.apifocal.org/greeter/wsrm"
                     serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort">
     </jaxws:endpoint>
-<!--
-    <bean id="greeterPersistBean" class="org.apifocal.demo.greeter.service.GreeterService" />
 
+    <http:conduit name="{http://demo.apifocal.org/greeter/wsrm}GreeterPort2.http-conduit">
+        <http:client DecoupledEndpoint="http://localhost:8182/decoupled-once"/>
+    </http:conduit>
+    <bean id="greeterOnceBean" class="org.apifocal.demo.greeter.service.GreeterService" />
+    <jaxws:endpoint id="greeterOnce"
+                    address="/greeter-once"
+                    implementor="#greeterOnceBean"
+                    implementorClass="org.apifocal.demo.greeter.service.GreeterService"
+                    wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/wsrm/greeter.wsdl"
+                    xmlns:ns1="http://demo.apifocal.org/greeter/wsrm"
+                    serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort2">
+    </jaxws:endpoint>
+
+    <!--
+    <http:conduit name="{http://demo.apifocal.org/greeter/wsrm}GreeterPort3.http-conduit">
+        <http:client DecoupledEndpoint="http://localhost:8182/decoupled-persist"/>
+    </http:conduit>
+    <bean id="greeterPersistBean" class="org.apifocal.demo.greeter.service.GreeterService" />
     <jaxws:endpoint id="greeterPersist"
                     address="/greeter-persist"
                     implementor="#greeterPersistBean"
                     implementorClass="org.apifocal.demo.greeter.service.GreeterService"
                     wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/wsrm/greeter.wsdl"
                     xmlns:ns1="http://demo.apifocal.org/greeter/wsrm"
-                    serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort2">
+                    serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort3">
         <jaxws:features>
             <wsa:addressing />
             <wsrm-mgr:reliableMessaging>
-                <wsrm-policy:RMAssertion>
-                    <wsrm-policy:BaseRetransmissionInterval Milliseconds="4000" />
-                    <wsrm-policy:AcknowledgementInterval Milliseconds="2000" />
-                </wsrm-policy:RMAssertion>
-                <wsrm-mgr:destinationPolicy>
-                    <wsrm-mgr:acksPolicy intraMessageThreshold="0" />
-                </wsrm-mgr:destinationPolicy>
                 <wsrm-mgr:store>
                     <wsrm-mgr:jdbcStore dataSource="rmdbDatasource"/>
                 </wsrm-mgr:store>
             </wsrm-mgr:reliableMessaging>
         </jaxws:features>
     </jaxws:endpoint>
-
     <bean id="rmdbDatasource" class="org.apache.derby.jdbc.EmbeddedDataSource">
         <property name="databaseName" value="rmdbLink"/>
         <property name="createDatabase" value="create"/>
@@ -108,5 +110,5 @@
             <entry key="url" value="jdbc:derby:rmdbLink"/>
         </service-properties>
     </service>
--->
+    -->
 </blueprint>

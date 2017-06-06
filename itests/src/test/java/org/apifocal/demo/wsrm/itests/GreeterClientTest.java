@@ -58,13 +58,14 @@ public class GreeterClientTest extends KarafTestSupport {
         MavenUrlReference demoFeaturesRepo = getFeaturesRepo("org.apifocal.demo.wsrm", "features");
         MavenUrlReference cxfFeaturesRepo = getFeaturesRepo("org.apache.cxf.karaf", "apache-cxf");
 
-	    return new Option[] {
-	        standardConfig(),
-	        cxfTestUtils(),
-	        features(cxfFeaturesRepo, "http", "cxf-http-jetty"),
-	        features(demoFeaturesRepo, "greeter-wsrm"),
-	   };
-	}
+        return new Option[] {
+            debugConfig(),
+            // standardConfig(),
+            cxfTestUtils(),
+            features(cxfFeaturesRepo, "http", "cxf-http-jetty"),
+            features(demoFeaturesRepo, "greeter-wsrm"),
+       };
+    }
 
     @Before
     public void createClient() {

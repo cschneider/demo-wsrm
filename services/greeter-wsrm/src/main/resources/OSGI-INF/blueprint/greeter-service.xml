@@ -50,9 +50,25 @@
                 <wsrm-mgr:destinationPolicy>
                     <wsrm-mgr:acksPolicy intraMessageThreshold="0" />
                 </wsrm-mgr:destinationPolicy>
+                <!-- Comment out the next section (element) to remove persistence support -->
+                <wsrm-mgr:store>
+                    <wsrm-mgr:jdbcStore dataSource="rmdbDatasource"/>
+                </wsrm-mgr:store>
             </wsrm-mgr:reliableMessaging>
         </cxf:features>
     </cxf:bus>
+    <bean id="rmdbDatasource" class="org.apache.derby.jdbc.EmbeddedDataSource">
+        <property name="databaseName" value="rmdbLink" />
+        <property name="createDatabase" value="create" />
+    </bean>
+    <service ref="rmdbDatasource" interface="javax.sql.DataSource">
+        <service-properties>
+            <entry key="dataSourceName" value="rmdbLink" />
+            <entry key="osgi.jdbc.driver.name" value="derby" />
+            <entry key="osgi.jndi.service.name" value="rmdbLink" />
+            <entry key="url" value="jdbc:derby:rmdbLink" />
+        </service-properties>
+    </service>
 
     <bean id="greeterWsrmBean" class="org.apifocal.demo.greeter.service.GreeterService" />
     <jaxws:endpoint id="greeterWsrm"
@@ -77,38 +93,20 @@
                     serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort2">
     </jaxws:endpoint>
 
-    <!--
     <http:conduit name="{http://demo.apifocal.org/greeter/wsrm}GreeterPort3.http-conduit">
-        <http:client DecoupledEndpoint="http://localhost:8182/decoupled-persist"/>
+        <http:client DecoupledEndpoint="http://localhost:8182/decoupled-exact"/>
     </http:conduit>
-    <bean id="greeterPersistBean" class="org.apifocal.demo.greeter.service.GreeterService" />
-    <jaxws:endpoint id="greeterPersist"
-                    address="/greeter-persist"
-                    implementor="#greeterPersistBean"
+    <bean id="greeterExactBean" class="org.apifocal.demo.greeter.service.GreeterService" />
+    <jaxws:endpoint id="greeterExact"
+                    address="/greeter-exact"
+                    implementor="#greeterExactBean"
                     implementorClass="org.apifocal.demo.greeter.service.GreeterService"
                     wsdlLocation="META-INF/wsdl/org/apifocal/demo/greeter/wsrm/greeter.wsdl"
                     xmlns:ns1="http://demo.apifocal.org/greeter/wsrm"
                     serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort3">
         <jaxws:features>
             <wsa:addressing />
-            <wsrm-mgr:reliableMessaging>
-                <wsrm-mgr:store>
-                    <wsrm-mgr:jdbcStore dataSource="rmdbDatasource"/>
-                </wsrm-mgr:store>
-            </wsrm-mgr:reliableMessaging>
         </jaxws:features>
     </jaxws:endpoint>
-    <bean id="rmdbDatasource" class="org.apache.derby.jdbc.EmbeddedDataSource">
-        <property name="databaseName" value="rmdbLink"/>
-        <property name="createDatabase" value="create"/>
-    </bean>
-    <service ref="rmdbDatasource" interface="javax.sql.DataSource">
-        <service-properties>
-            <entry key="dataSourceName" value="rmdbLink"/>
-            <entry key="osgi.jdbc.driver.name" value="derby"/>
-            <entry key="osgi.jndi.service.name" value="rmdbLink"/>
-            <entry key="url" value="jdbc:derby:rmdbLink"/>
-        </service-properties>
-    </service>
-    -->
+
 </blueprint>

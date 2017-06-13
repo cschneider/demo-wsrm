@@ -45,4 +45,14 @@
         <bundle>mvn:org.apifocal.demo.wsrm/greeter-wsrm/${project.version}</bundle>
     </feature>
 
+    <feature name='greeter-gateway' description='Sample Gateway behaving crazy' version='${project.version}'>
+        <details>HTTP gateway using servlets for testing abnormal behavior of networks</details>
+        <feature dependency="true">framework</feature>
+        <feature dependency="true">aries-blueprint</feature>
+        <feature dependency="true">http-whiteboard</feature>
+        <feature dependency="true">cxf-http-async</feature> <!-- provides httpclient-osgi -->
+
+        <bundle>mvn:org.apifocal.demo.wsrm/qos-gateway/${project.version}</bundle>
+    </feature>
+
 </features>

@@ -35,7 +35,9 @@ public class GreeterService implements Greeter {
 
     @Override
     public String greetMe(String name) {
-        return "Hello " + name;
+        String response = "Hello " + name;
+        LOG.info("Greeter salutes '{}' with '{}'", name, response);
+        return response;
     }
 
     @Override

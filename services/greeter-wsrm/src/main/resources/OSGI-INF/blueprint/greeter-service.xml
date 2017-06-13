@@ -80,9 +80,10 @@
                     serviceName="ns1:GreeterService" endpointName="ns1:GreeterPort">
     </jaxws:endpoint>
 
-    <http:conduit name="{http://demo.apifocal.org/greeter/wsrm}GreeterPort2.http-conduit">
-        <http:client DecoupledEndpoint="http://localhost:8182/decoupled-once"/>
-    </http:conduit>
+    <!-- For testing variation, GreeterPort2 does NOT use decouple endpoints, GreeterPort3 DOES -->
+    <!-- http:conduit name="{http://demo.apifocal.org/greeter/wsrm}GreeterPort2.http-conduit">
+        <http:client DecoupledEndpoint="http://localhost:8182/decoupled-once" />
+    </http:conduit -->
     <bean id="greeterOnceBean" class="org.apifocal.demo.greeter.service.GreeterService" />
     <jaxws:endpoint id="greeterOnce"
                     address="/greeter-once"
@@ -94,7 +95,7 @@
     </jaxws:endpoint>
 
     <http:conduit name="{http://demo.apifocal.org/greeter/wsrm}GreeterPort3.http-conduit">
-        <http:client DecoupledEndpoint="http://localhost:8182/decoupled-exact"/>
+        <http:client DecoupledEndpoint="http://localhost:8182/decoupled-exact" />
     </http:conduit>
     <bean id="greeterExactBean" class="org.apifocal.demo.greeter.service.GreeterService" />
     <jaxws:endpoint id="greeterExact"

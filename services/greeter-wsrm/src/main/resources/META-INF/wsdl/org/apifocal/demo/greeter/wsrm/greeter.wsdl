@@ -28,6 +28,28 @@
         <wsdl:port binding="greeter:GreeterSOAPBinding" name="GreeterPort">
             <soap:address location="http://example.com/SoapContext/GreeterPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2006/05/addressing/wsdl"/>
+            <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
+                <wsp:ExactlyOne>
+                    <wsp:All>
+                        <wsrmp:RMAssertion xmlns:wsrmp="http://docs.oasis-open.org/ws-rx/wsrmp/200702">
+                            <wsp:Policy>
+                                <wsrmp:DeliveryAssurance>
+                                    <wsp:Policy>
+                                        <wsp:ExactlyOne>
+                                            <wsp:All>
+                                                <wsrmp:AtMostOnce />
+                                            </wsp:All>
+                                        </wsp:ExactlyOne>
+                                    </wsp:Policy>
+                                </wsrmp:DeliveryAssurance>
+                            </wsp:Policy>
+                        </wsrmp:RMAssertion>
+                        <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
+                            <wsp:Policy />
+                        </wsam:Addressing>
+                    </wsp:All>
+                </wsp:ExactlyOne>
+            </wsp:Policy>
         </wsdl:port>
 
         <wsdl:port binding="greeter:GreeterSOAPBinding" name="GreeterPort2">
@@ -40,10 +62,12 @@
                             <wsp:Policy>
                                 <wsrmp:DeliveryAssurance>
                                     <wsp:Policy>
-                                        <wsrmp:AtLeastOnce />
-                                    </wsp:Policy>
-                                    <wsp:Policy>
-                                        <wsrmp:InOrder />
+                                        <wsp:ExactlyOne>
+                                            <wsp:All>
+                                                <wsrmp:AtLeastOnce />
+                                                <wsrmp:InOrder />
+                                            </wsp:All>
+                                        </wsp:ExactlyOne>
                                     </wsp:Policy>
                                 </wsrmp:DeliveryAssurance>
                             </wsp:Policy>
@@ -66,10 +90,12 @@
                             <wsp:Policy>
                                 <wsrmp:DeliveryAssurance>
                                     <wsp:Policy>
-                                        <wsrmp:ExactlyOnce />
-                                    </wsp:Policy>
-                                    <wsp:Policy>
-                                        <wsrmp:InOrder />
+                                        <wsp:ExactlyOne>
+                                            <wsp:All>
+                                                <wsrmp:ExactlyOnce />
+                                                <wsrmp:InOrder />
+                                            </wsp:All>
+                                        </wsp:ExactlyOne>
                                     </wsp:Policy>
                                 </wsrmp:DeliveryAssurance>
                             </wsp:Policy>

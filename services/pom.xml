@@ -33,6 +33,7 @@
         <module>greeter-common</module>
         <module>greeter-service</module>
         <module>greeter-wsrm</module>
+        <module>qos-gateway</module>
     </modules>
 
 </project>

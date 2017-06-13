@@ -26,6 +26,8 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -95,12 +97,19 @@ public final class OSGiTestHelper {
         return feature;
 	}
 
-
 	public static Greeter greeterHttpProxy(String port, String address) {
+		return greeterHttpProxy(port, address, address);
+	}
+
+	public static Greeter greeterHttpProxy(String port, String address, String wsdl) {
+        Bus bus = CXFBusFactory.newInstance().createBus();
+        bus.setFeatures(Arrays.asList(logging(), wsa(), wsrm()));
+
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setBus(bus);
         factory.setServiceClass(Greeter.class);
         factory.setAddress("http://localhost:" + port + "/cxf/" + address);
-        factory.setWsdlLocation("http://localhost:" + port + "/cxf/" + address + "?wsdl");
+        factory.setWsdlLocation("http://localhost:" + port + "/cxf/" + wsdl + "?wsdl");
         factory.setFeatures(Arrays.asList(logging(), wsa(), wsrm()));
         return factory.create(Greeter.class);
     }

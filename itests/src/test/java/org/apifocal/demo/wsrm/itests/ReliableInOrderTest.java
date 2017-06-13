@@ -129,9 +129,7 @@ public class ReliableInOrderTest extends KarafTestSupport {
         	Thread.sleep(20);
             Future<String> future = executor.submit(() -> {
                 String who = String.format("World-%04d", index.incrementAndGet());
-                String result = "";
-                synchronized(this) { greeter.greetMe(who); }
-                return result;
+                return greeter.greetMe(who);
             });
             responses.add(future);
         }

@@ -129,12 +129,14 @@ public class ReliableInOrderTest extends KarafTestSupport {
         	Thread.sleep(20);
             Future<String> future = executor.submit(() -> {
                 String who = String.format("World-%04d", index.incrementAndGet());
-                return greeter.greetMe(who);
+                String result = "";
+                synchronized(this) { greeter.greetMe(who); }
+                return result;
             });
             responses.add(future);
         }
 
-        int attempts = 24; // will give up after 20 attempts (about 2 min)
+        int attempts = 64; // will give up after 20 attempts (about 2 min)
         while (responses.size() > 0 && --attempts > 0) {
             LOG.info("Giving the test a bit of time... still {} futures to handle", responses.size());
             Thread.sleep(5000);

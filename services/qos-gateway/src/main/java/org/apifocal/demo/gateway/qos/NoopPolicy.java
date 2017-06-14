@@ -18,14 +18,14 @@ package org.apifocal.demo.gateway.qos;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
+import org.apache.http.HttpEntityEnclosingRequest;
 
 /**
  * Drops no messages.
  */
 public class NoopPolicy implements QosPolicy {
 
-	public void process(HttpServletRequest request) throws IOException {
+	public void process(HttpEntityEnclosingRequest proxyRequest) throws IOException {
 		// noop, do nothing
 	}
 

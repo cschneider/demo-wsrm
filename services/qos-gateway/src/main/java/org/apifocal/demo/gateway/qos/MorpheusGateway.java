@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
@@ -40,6 +41,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.AbortableHttpRequest;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
@@ -81,12 +83,8 @@ public class MorpheusGateway extends HttpServlet {
     private HttpHost target;
     private HttpClient proxy;
 
-
     public MorpheusGateway() {
         LOG.info("MorpheusGateway CREATED");
-        
-        HttpClientBuilder b;
-
     }
 
     public String getPolicy() {
@@ -107,38 +105,31 @@ public class MorpheusGateway extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-    	super.init();
+        super.init();
+        qos = PolicyFactory.create(policy);
+        LOG.info("Initializing MorpheusGateway {} policy with qos={} ", policy, qos);
 
-    	qos = policy.equals("delay") ?  new RandomDelayPolicy() : new NoopPolicy();
-    	LOG.info("Initializing MorpheusGateway {} policy with qos={} ", policy, qos);
-
-    	try {
-			target = URIUtils.extractHost(forward.toURI());
-		} catch (URISyntaxException e) {
-			throw new ServletException("Failed to parse URI", e);
+        try {
+            target = URIUtils.extractHost(forward.toURI());
+        } catch (URISyntaxException e) {
+            throw new ServletException("Failed to parse URI", e);
         }
-        RequestConfig.Builder config = RequestConfig.custom()
+        RequestConfig config = RequestConfig.custom()
             .setRedirectsEnabled(false)
             .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
-            .setConnectTimeout(-1);
-        proxy = HttpClientBuilder.create().setDefaultRequestConfig(config.build()).build();
+            .setConnectTimeout(-1).build();
+        proxy = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
     }
 
     public void destroy() {
-    	if (proxy != null) {
-            if (proxy instanceof Closeable) {
-    	        try {
-    	            ((Closeable)proxy).close();
-    	        } catch (IOException e) {
-    	            LOG.warn("Failed to destroy MorpheusGateway: {}", e);
-    	        }
-    	    } else {
-    	        LOG.warn("Old version of HttpClient?");
-    	        proxy.getConnectionManager().shutdown();
-    	    }
-    	}
+        if (proxy != null) {
+            try {
+                ((Closeable)proxy).close();
+            } catch (IOException e) {
+                LOG.warn("Failed to destroy MorpheusGateway: {}", e);
+            }
+        }
         LOG.info("Destroyed MorpheusGateway");
-
         super.destroy();
     }
 
@@ -153,11 +144,14 @@ public class MorpheusGateway extends HttpServlet {
         return forward.toString();
     }
 
-    protected HttpRequest createRequest(String method, String uri, HttpServletRequest servletRequest) throws IOException {
+    protected HttpEntityEnclosingRequest createRequest(String method, String uri, HttpServletRequest servletRequest) throws IOException {
         HttpEntityEnclosingRequest pr = new BasicHttpEntityEnclosingRequest(method, uri);
-        // Add the input entity (streamed)
-        //  note: we don't bother ensuring we close the servletInputStream since the container handles it
-        pr.setEntity(new InputStreamEntity(servletRequest.getInputStream(), getContentLength(servletRequest)));
+        // spec: RFC 2616, sec 4.3: either of these two headers signal that there is a message body.
+        if ((servletRequest.getHeader(HttpHeaders.CONTENT_LENGTH) != null 
+            || servletRequest.getHeader(HttpHeaders.TRANSFER_ENCODING) != null)) { 
+            String content = MorpheusHelper.readStream(servletRequest.getInputStream());
+            pr.setEntity(new StringEntity(content));
+        }
         return pr;
     }
 
@@ -235,20 +229,16 @@ public class MorpheusGateway extends HttpServlet {
 
         String method = request.getMethod();
         String uri = rewriteProxyUrl(request);
-        HttpRequest proxyRequest;
-
-        // spec: RFC 2616, sec 4.3: either of these two headers signal that there is a message body.
-        proxyRequest = (request.getHeader(HttpHeaders.CONTENT_LENGTH) != null || request.getHeader(HttpHeaders.TRANSFER_ENCODING) != null) 
-            ? createRequest(method, uri, request) : new BasicHttpRequest(method, uri);
+        HttpEntityEnclosingRequest proxyRequest = createRequest(method, uri, request);
 
         copyRequestHeaders(request, proxyRequest);
         HttpResponse proxyResponse = null;
         try {
-        	// Simulate QoS issues before forwarding
-        	LOG.info("Applying QoS policy {}", qos);
-        	qos.process(request);
+            // Simulate QoS issues before forwarding
+            LOG.info("Applying QoS policy {}", qos);
+            qos.process(proxyRequest);
 
-        	proxyResponse = doProxy(request, response, proxyRequest);
+            proxyResponse = doProxy(request, response, proxyRequest);
             int statusCode = proxyResponse.getStatusLine().getStatusCode();
             response.setStatus(statusCode, proxyResponse.getStatusLine().getReasonPhrase());
             copyResponseHeaders(proxyResponse, request, response);
@@ -274,55 +264,6 @@ public class MorpheusGateway extends HttpServlet {
                 consumeQuietly(proxyResponse.getEntity());
             }
         }
-        /*
-        // read request
-        HttpURLConnection upstreamCon = (HttpURLConnection)forward.openConnection();
-        upstreamCon.setRequestMethod(request.getMethod());
-        for (Enumeration<?> headers = request.getHeaderNames(); headers.hasMoreElements();) {
-            String headerName = (String) headers.nextElement();
-            StringBuilder headerListValue = null;
-            for (Enumeration<?> headerValues = request.getHeaders(headerName); headerValues.hasMoreElements();) {
-                String headerValue = (String) headerValues.nextElement();
-                if (headerListValue == null) {
-                    headerListValue = new StringBuilder(headerValue);
-                } else {
-                    headerListValue.append(',');
-                    headerListValue.append(headerValue);
-                }
-            }
-            upstreamCon.setRequestProperty(headerName, headerListValue.toString());
-        }
-
-        String body = null;
-        try (ServletInputStream is = request.getInputStream()) {
-            body = MorpheusHelper.readStream(is);
-        }
-
-        LOG.info("MorpheusGateway forwarding to address '{}' body: {}", forward, body != null ? body : "<null>");
-        if (body != null) {
-            upstreamCon.setDoOutput(true);
-            try (OutputStream reqOs = upstreamCon.getOutputStream()) {
-                reqOs.write(body.getBytes(MorpheusHelper.encoding(request.getCharacterEncoding())));
-            }
-        }
-        */
-
-
-        /*
-        try {
-            policy.process(request);
-        } catch(IOException e) {
-        	LOG.info("QoS policy dropped request {}", id);
-        }
-        */
-    }
-
-    private static long getContentLength(HttpServletRequest request) {
-        String contentLengthHeader = request.getHeader("Content-Length");
-        if (contentLengthHeader != null) {
-            return Long.parseLong(contentLengthHeader);
-        }
-        return -1L;
     }
 
     protected static void consumeQuietly(HttpEntity entity) {

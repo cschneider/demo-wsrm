@@ -42,7 +42,4 @@
         </service-properties>
     </service>
 
-    <bean id="noop" class="org.apifocal.demo.gateway.qos.NoopPolicy" />
-    <bean id="delay" class="org.apifocal.demo.gateway.qos.RandomDelayPolicy" />
-
 </blueprint>

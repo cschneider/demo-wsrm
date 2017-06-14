@@ -17,7 +17,7 @@ package org.apifocal.demo.gateway.qos;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
+import org.apache.http.HttpEntityEnclosingRequest;
 
 /**
  * Quality of Service policy
@@ -27,6 +27,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface QosPolicy {
 
-    void process(HttpServletRequest request) throws IOException;
+    void process(HttpEntityEnclosingRequest proxyRequest) throws IOException;
 
 }

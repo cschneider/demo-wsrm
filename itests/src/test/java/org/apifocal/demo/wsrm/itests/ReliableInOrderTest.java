@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 @ExamReactorStrategy(PerClass.class)
 public class ReliableInOrderTest extends KarafTestSupport {
     private static final Logger LOG = LoggerFactory.getLogger(ReliableInOrderTest.class);
-    private static final int COUNT = 50;
+    private static final int COUNT = 4;
 
     @Inject
     @Filter("(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*)")
@@ -77,7 +77,13 @@ public class ReliableInOrderTest extends KarafTestSupport {
             editConfigurationFilePut("etc/org.apifocal.demo.gateway.qos.cfg", 
                 "org.apifocal.demo.gateway.forward", "http://localhost:8181/cxf/greeter-once"),
             editConfigurationFilePut("etc/org.apifocal.demo.gateway.qos.cfg", 
-                "org.apifocal.demo.gateway.policy", "delay"), // NOTE: possible values are "noop" or "delay"
+                "org.apifocal.demo.gateway.policy", "delaySecond"),
+            /*
+            editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", 
+                                     "org.ops4j.pax.web.server.maxThreads", "50"),
+            editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", 
+                                     "org.ops4j.pax.web.config.file", "/home/cschneider/java/apache-karaf-4.0.8/etc/jetty.xml"),
+                                     */
        };
     }
 
@@ -119,14 +125,15 @@ public class ReliableInOrderTest extends KarafTestSupport {
         LOG.info("Async send test");
 
         // First message will trigger a CreateSequence
-        await().ignoreExceptions().pollDelay(1, TimeUnit.SECONDS).until(() -> greeter.greetMe("World-0001"), is("Hello World-0001"));
+        await().ignoreExceptions().pollDelay(1, TimeUnit.SECONDS).until(() -> greeter.greetMe("World-0001"),
+                                                                        is("Hello World-0001"));
 
         final AtomicInteger index = new AtomicInteger(1);
         List<Future<String>> responses = new ArrayList<Future<String>>(200);
-        ExecutorService executor = Executors.newFixedThreadPool(8);
+        ExecutorService executor = Executors.newFixedThreadPool(COUNT);
 
         for (int i = 1; i < COUNT; i++) {
-        	Thread.sleep(20);
+            Thread.sleep(20);
             Future<String> future = executor.submit(() -> {
                 String who = String.format("World-%04d", index.incrementAndGet());
                 return greeter.greetMe(who);
@@ -134,22 +141,23 @@ public class ReliableInOrderTest extends KarafTestSupport {
             responses.add(future);
         }
 
-        int attempts = 64; // will give up after 20 attempts (about 2 min)
+        int attempts = 10;
         while (responses.size() > 0 && --attempts > 0) {
             LOG.info("Giving the test a bit of time... still {} futures to handle", responses.size());
             Thread.sleep(5000);
-        	for (Iterator<Future<String>> it = responses.iterator(); it.hasNext();) {
-        		Future<String> f = it.next();
-            	if (f.isDone()) {
-            		try {
-            			String r = f.get();
+            for (Iterator<Future<String>> it = responses.iterator(); it.hasNext();) {
+                Future<String> f = it.next();
+                if (f.isDone()) {
+                    try {
+                        String r = f.get();
                         LOG.info("Greeting: {}", r);
                         Assert.assertTrue(r.startsWith("Hello World-0"));
-            		} catch (Exception e) {
-            			LOG.warn("Future execution resulted in exception {}: {}", e.getClass().getName(), e.getMessage());
-            		}
+                    } catch (Exception e) {
+                        LOG.warn("Future execution resulted in exception {}: {}", e.getClass().getName(),
+                                 e.getMessage());
+                    }
                     it.remove();
-            	}
+                }
             }
         }
 

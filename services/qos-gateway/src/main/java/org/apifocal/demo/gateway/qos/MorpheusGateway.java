@@ -318,47 +318,6 @@ public class MorpheusGateway extends HttpServlet {
                 consumeQuietly(proxyResponse.getEntity());
             }
         }
-        /*
-        // read request
-        HttpURLConnection upstreamCon = (HttpURLConnection)forward.openConnection();
-        upstreamCon.setRequestMethod(request.getMethod());
-        for (Enumeration<?> headers = request.getHeaderNames(); headers.hasMoreElements();) {
-            String headerName = (String) headers.nextElement();
-            StringBuilder headerListValue = null;
-            for (Enumeration<?> headerValues = request.getHeaders(headerName); headerValues.hasMoreElements();) {
-                String headerValue = (String) headerValues.nextElement();
-                if (headerListValue == null) {
-                    headerListValue = new StringBuilder(headerValue);
-                } else {
-                    headerListValue.append(',');
-                    headerListValue.append(headerValue);
-                }
-            }
-            upstreamCon.setRequestProperty(headerName, headerListValue.toString());
-        }
-
-        String body = null;
-        try (ServletInputStream is = request.getInputStream()) {
-            body = MorpheusHelper.readStream(is);
-        }
-
-        LOG.info("MorpheusGateway forwarding to address '{}' body: {}", forward, body != null ? body : "<null>");
-        if (body != null) {
-            upstreamCon.setDoOutput(true);
-            try (OutputStream reqOs = upstreamCon.getOutputStream()) {
-                reqOs.write(body.getBytes(MorpheusHelper.encoding(request.getCharacterEncoding())));
-            }
-        }
-        */
-
-
-        /*
-        try {
-            policy.process(request);
-        } catch(IOException e) {
-        	LOG.info("QoS policy dropped request {}", id);
-        }
-        */
     }
 
     private static long getContentLength(HttpServletRequest request) {

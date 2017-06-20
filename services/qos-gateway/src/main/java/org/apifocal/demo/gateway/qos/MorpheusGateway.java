@@ -17,12 +17,19 @@ package org.apifocal.demo.gateway.qos;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -245,16 +252,53 @@ public class MorpheusGateway extends HttpServlet {
         HttpResponse proxyResponse = null;
         try {
         	// Simulate QoS issues before forwarding
-        	LOG.info("Applying QoS policy {}", qos);
-        	qos.process(request);
+            // read request
+            LOG.info("Applying QoS policy {}", qos);
+            qos.process(request);
 
-        	proxyResponse = doProxy(request, response, proxyRequest);
-            int statusCode = proxyResponse.getStatusLine().getStatusCode();
-            response.setStatus(statusCode, proxyResponse.getStatusLine().getReasonPhrase());
-            copyResponseHeaders(proxyResponse, request, response);
+            HttpURLConnection upstreamCon = (HttpURLConnection)forward.openConnection();
+            upstreamCon.setRequestMethod(request.getMethod());
+            for (Enumeration<?> headers = request.getHeaderNames(); headers.hasMoreElements();) {
+                String headerName = (String) headers.nextElement();
+                StringBuilder headerListValue = null;
+                for (Enumeration<?> headerValues = request.getHeaders(headerName); headerValues.hasMoreElements();) {
+                    String headerValue = (String) headerValues.nextElement();
+                    if (headerListValue == null) {
+                        headerListValue = new StringBuilder(headerValue);
+                    } else {
+                        headerListValue.append(',');
+                        headerListValue.append(headerValue);
+                    }
+                }
+                upstreamCon.setRequestProperty(headerName, headerListValue.toString());
+            }
 
-            // if (statusCode == HttpServletResponse.SC_NOT_MODIFIED) // TODO: 304 may require special handling
-            copyResponseEntity(proxyResponse, response, proxyRequest, request);
+            upstreamCon.setDoOutput(true);
+            byte bytes[] = new byte[4096];
+            try (ServletInputStream is = request.getInputStream(); OutputStream out = upstreamCon.getOutputStream()) {
+                int len = -1;
+                while ((len = is.read(bytes)) != -1) {
+                    out.write(bytes, 0, len);
+                }
+                out.flush();
+            }
+            int rc = upstreamCon.getResponseCode();
+            response.setStatus(rc);
+            for (Map.Entry<String, List<String>> v : upstreamCon.getHeaderFields().entrySet()) {
+                for (String s : v.getValue()) {
+                    if (v.getKey() != null && s != null) {
+                        response.addHeader(v.getKey(), s);
+                    }
+                }
+            }
+            try (ServletOutputStream out = response.getOutputStream(); InputStream is = upstreamCon.getInputStream()) {
+                int len = -1;
+                while ((len = is.read(bytes)) != -1) {
+                    out.write(bytes, 0, len);
+                }
+                out.flush();
+            }
+
         } catch(Exception e) {
             if (proxyRequest instanceof AbortableHttpRequest) {
                 AbortableHttpRequest abortableHttpRequest = (AbortableHttpRequest)proxyRequest;

@@ -28,15 +28,15 @@ public class RandomDelayPolicy implements QosPolicy {
 	private static final Logger LOG = LoggerFactory.getLogger(RandomDelayPolicy.class);
 	private static final Random RAND = new Random();
 
-	private static final int RATE_DELAY500 = 5;
-	private static final int RATE_DELAY100 = 10;
+	private static final int RATE_DELAY500 = 10;
+	private static final int RATE_DELAY100 = 25;
 
 	public void process(HttpServletRequest request) throws IOException {
         int  n = RAND.nextInt(100);
 
         int delay = 0;
         if (n < RATE_DELAY500) {
-        	delay = 500;
+        	delay = 1000;
         } else if (n < RATE_DELAY500 + RATE_DELAY100) {
         	delay = 100;
         }

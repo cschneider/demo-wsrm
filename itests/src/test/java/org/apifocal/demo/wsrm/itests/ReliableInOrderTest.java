@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 @ExamReactorStrategy(PerClass.class)
 public class ReliableInOrderTest extends KarafTestSupport {
     private static final Logger LOG = LoggerFactory.getLogger(ReliableInOrderTest.class);
-    private static final int COUNT = 50;
+    private static final int COUNT = 200;
 
     @Inject
     @Filter("(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*)")
@@ -122,8 +122,8 @@ public class ReliableInOrderTest extends KarafTestSupport {
         await().ignoreExceptions().pollDelay(1, TimeUnit.SECONDS).until(() -> greeter.greetMe("World-0001"), is("Hello World-0001"));
 
         final AtomicInteger index = new AtomicInteger(1);
-        List<Future<String>> responses = new ArrayList<Future<String>>(200);
-        ExecutorService executor = Executors.newFixedThreadPool(8);
+        List<Future<String>> responses = new ArrayList<Future<String>>(1000);
+        ExecutorService executor = Executors.newFixedThreadPool(12);
 
         for (int i = 1; i < COUNT; i++) {
         	Thread.sleep(20);

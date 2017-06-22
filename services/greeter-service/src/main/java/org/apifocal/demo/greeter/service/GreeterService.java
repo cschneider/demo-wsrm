@@ -15,10 +15,17 @@
  */
 package org.apifocal.demo.greeter.service;
 
+import java.util.concurrent.Future;
+
 import javax.jws.WebService;
+import javax.xml.ws.AsyncHandler;
+import javax.xml.ws.Response;
 
 import org.apifocal.demo.greeter.Greeter;
 import org.apifocal.demo.greeter.PingMeFault;
+import org.apifocal.demo.greeter.types.GreetMeResponse;
+import org.apifocal.demo.greeter.types.PingMeResponse;
+import org.apifocal.demo.greeter.types.SayHiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +58,42 @@ public class GreeterService implements Greeter {
 
     @Override
     public void greetMeOneWay(String name) {
+    }
+
+    @Override
+    public Response<GreetMeResponse> greetMeAsync(String requestType) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Future<?> greetMeAsync(String requestType, AsyncHandler<GreetMeResponse> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Response<PingMeResponse> pingMeAsync() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Future<?> pingMeAsync(AsyncHandler<PingMeResponse> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Response<SayHiResponse> sayHiAsync() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

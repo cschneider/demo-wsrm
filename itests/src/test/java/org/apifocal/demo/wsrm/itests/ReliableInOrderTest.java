@@ -23,8 +23,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,6 +32,7 @@ import javax.inject.Inject;
 import org.apache.cxf.Bus;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apifocal.demo.greeter.Greeter;
+import org.apifocal.demo.greeter.types.GreetMeResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,7 +53,7 @@ import org.slf4j.LoggerFactory;
 @ExamReactorStrategy(PerClass.class)
 public class ReliableInOrderTest extends KarafTestSupport {
     private static final Logger LOG = LoggerFactory.getLogger(ReliableInOrderTest.class);
-    private static final int COUNT = 200;
+    private static final int COUNT = 1000;
 
     @Inject
     @Filter("(cxf.bus.id=org.apifocal.demo.wsrm.greeter-wsrm-cxf*)")
@@ -122,31 +121,29 @@ public class ReliableInOrderTest extends KarafTestSupport {
         await().ignoreExceptions().pollDelay(1, TimeUnit.SECONDS).until(() -> greeter.greetMe("World-0001"), is("Hello World-0001"));
 
         final AtomicInteger index = new AtomicInteger(1);
-        List<Future<String>> responses = new ArrayList<Future<String>>(1000);
-        ExecutorService executor = Executors.newFixedThreadPool(12);
+        List<Future<GreetMeResponse>> responses = new ArrayList<Future<GreetMeResponse>>(1000);
 
         for (int i = 1; i < COUNT; i++) {
-        	Thread.sleep(20);
-            Future<String> future = executor.submit(() -> {
-                String who = String.format("World-%04d", index.incrementAndGet());
-                return greeter.greetMe(who);
-            });
-            responses.add(future);
+            Thread.sleep(10);
+            String who = String.format("World-%04d", index.incrementAndGet());
+            Future<GreetMeResponse> response = greeter.greetMeAsync(who);
+            responses.add(response);
         }
 
         int attempts = 64; // will give up after 20 attempts (about 2 min)
         while (responses.size() > 0 && --attempts > 0) {
             LOG.info("Giving the test a bit of time... still {} futures to handle", responses.size());
             Thread.sleep(5000);
-        	for (Iterator<Future<String>> it = responses.iterator(); it.hasNext();) {
-        		Future<String> f = it.next();
+        	for (Iterator<Future<GreetMeResponse>> it = responses.iterator(); it.hasNext();) {
+        		Future<GreetMeResponse> f = it.next();
             	if (f.isDone()) {
             		try {
-            			String r = f.get();
+            		    GreetMeResponse r = f.get();
                         LOG.info("Greeting: {}", r);
-                        Assert.assertTrue(r.startsWith("Hello World-0"));
+                        Assert.assertTrue(r.getResponseType().startsWith("Hello World-"));
             		} catch (Exception e) {
-            			LOG.warn("Future execution resulted in exception {}: {}", e.getClass().getName(), e.getMessage());
+            		    throw e;
+            		    //LOG.warn("Future execution resulted in exception {}: {}", e.getClass().getName(), e);
             		}
                     it.remove();
             	}

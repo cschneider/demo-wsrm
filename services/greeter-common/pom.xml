@@ -58,6 +58,11 @@
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/META-INF/wsdl/org/apifocal/demo/greeter/greeter.wsdl</wsdl>
                                     <faultSerialVersionUID>1</faultSerialVersionUID>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <extraargs>
+                                         <extraarg>-b</extraarg>
+                                         <extraarg>${basedir}/src/main/resources/META-INF/async_binding.xml</extraarg>
+                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
                             <sourceRoot>${basedir}/target/generated-sources/cxf-codegen-plugin</sourceRoot>

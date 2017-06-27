@@ -47,6 +47,7 @@
 
     <feature name='greeter-gateway' description='Sample Gateway behaving crazy' version='${project.version}'>
         <details>HTTP gateway using servlets for testing abnormal behavior of networks</details>
+        <feature>war</feature>
         <feature dependency="true">framework</feature>
         <feature dependency="true">aries-blueprint</feature>
         <feature dependency="true">http-whiteboard</feature>
